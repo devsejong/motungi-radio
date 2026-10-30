@@ -85,6 +85,34 @@ fn clamped_position(
         py.clamp(wy, wy + (wh.saturating_sub(height)) as i32),
     )
 }
+/// Pick the display that owns a tray rect. macOS status-item rects for secondary
+/// displays can land just outside their monitor bounds, so fall back to the nearest
+/// display instead of refusing to place the window.
+fn monitor_for_tray(areas: &[(i32, i32, u32, u32)], point: (i32, i32)) -> Option<usize> {
+    if let Some(index) = areas.iter().position(|area| contains_point(*area, point)) {
+        return Some(index);
+    }
+    (0..areas.len()).min_by_key(|index| distance_squared(areas[*index], point))
+}
+fn distance_squared(area: (i32, i32, u32, u32), point: (i32, i32)) -> i64 {
+    let (x, y, w, h) = area;
+    let (px, py) = point;
+    let span = |start: i32, len: u32, value: i32| {
+        let start = start as i64;
+        let end = start + len as i64;
+        let value = value as i64;
+        if value < start {
+            start - value
+        } else if value >= end {
+            value - end
+        } else {
+            0
+        }
+    };
+    let dx = span(x, w, px);
+    let dy = span(y, h, py);
+    dx * dx + dy * dy
+}
 pub fn show(app: &tauri::AppHandle, rect: Option<tauri::Rect>) {
     if let Some(window) = app.get_webview_window("main") {
         let mut positioned = false;
@@ -95,27 +123,33 @@ pub fn show(app: &tauri::AppHandle, rect: Option<tauri::Rect>) {
             let point = rect.position.to_physical::<i32>(1.0);
             // macOS monitor_from_point forwards to CoreGraphics logical coordinates,
             // while tray rectangles are physical pixels. Compare physical bounds directly.
-            if let Some(monitor) = window.available_monitors().ok().and_then(|monitors| {
-                monitors.into_iter().find(|m| {
+            let monitors = window.available_monitors().unwrap_or_default();
+            let areas: Vec<(i32, i32, u32, u32)> = monitors
+                .iter()
+                .map(|m| {
                     let pos = m.position();
                     let size = m.size();
-                    contains_point((pos.x, pos.y, size.width, size.height), (point.x, point.y))
+                    (pos.x, pos.y, size.width, size.height)
                 })
-            }) {
+                .collect();
+            if let Some(monitor) = monitor_for_tray(&areas, (point.x, point.y))
+                .and_then(|index| monitors.get(index))
+            {
                 // Tray rectangles already use physical pixels; applying monitor scaling twice shifts Retina placement.
                 let scale = 1.0;
                 let pos = rect.position.to_physical::<i32>(scale);
                 let size = rect.size.to_physical::<u32>(scale);
                 let work = monitor.work_area();
+                let work = (
+                    work.position.x,
+                    work.position.y,
+                    work.size.width,
+                    work.size.height,
+                );
                 if let Ok(ws) = window.outer_size() {
                     let (x, y) = clamped_position(
                         (pos.x, pos.y, size.width, size.height),
-                        (
-                            work.position.x,
-                            work.position.y,
-                            work.size.width,
-                            work.size.height,
-                        ),
+                        work,
                         (ws.width, ws.height),
                         cfg!(target_os = "macos"),
                     );
@@ -123,9 +157,14 @@ pub fn show(app: &tauri::AppHandle, rect: Option<tauri::Rect>) {
                 }
             }
         }
-        if cfg!(target_os = "macos") && !positioned
+        // Keep the first launch hidden only when there is no tray anchor at all; a tray
+        // rect that misses every monitor still means the user asked for the window.
+        if cfg!(target_os = "macos")
+            && !positioned
+            && rect.is_none()
             && !window.is_visible().unwrap_or(false)
-            && !app.try_state::<PlayerWindowState>().is_some_and(|s| s.pinned.load(Ordering::SeqCst)) {
+            && !app.try_state::<PlayerWindowState>().is_some_and(|s| s.pinned.load(Ordering::SeqCst))
+        {
             return;
         }
         let _ = window.unminimize();
@@ -453,6 +492,28 @@ mod tests {
             (2600, 56)
         );
     }
+    #[test]
+    fn tray_rect_outside_every_display_still_picks_nearest_monitor() {
+        // Reproduced: a status item on a left-hand secondary display reports x=-3106
+        // while that monitor starts at -3024, so an exact-bounds lookup finds nothing
+        // and the window was never shown.
+        let areas = [(0, 0, 5120, 3414), (-3024, 0, 3024, 1964), (5120, 172, 5120, 2880)];
+        assert_eq!(monitor_for_tray(&areas, (-3106, 0)), Some(1));
+        assert_eq!(monitor_for_tray(&areas, (-200, 100)), Some(1));
+        assert_eq!(monitor_for_tray(&areas, (100, 100)), Some(0));
+        assert_eq!(monitor_for_tray(&areas, (9999, 100)), Some(2));
+        assert_eq!(monitor_for_tray(&[], (0, 0)), None);
+    }
+
+    #[test]
+    fn tray_distance_uses_rectangle_edges() {
+        let area = (-3024, 0, 3024, 1964);
+        // 82px to the left of the display, so the display is still the nearest one.
+        assert_eq!(distance_squared(area, (-3106, 0)), 82 * 82);
+        assert_eq!(distance_squared(area, (-200, 100)), 0);
+        assert_eq!(distance_squared((0, 0, 100, 100), (150, 200)), 50 * 50 + 100 * 100);
+    }
+
     #[test]
     fn mac_places_below_and_clamps_right() {
         assert_eq!(
