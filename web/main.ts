@@ -4,9 +4,13 @@ import { stations, supported, resolve } from "./streams";
 import "./style.css";
 import { watchPrograms, type Program } from "./programs";
 import { artwork } from "./artwork";
+import { searchStations } from "./search";
 let programs = new Map<string, Program>();
 const rowArt = new Map<string, ReturnType<typeof artwork>>();
 const rowTitles = new Map<string, HTMLElement>();
+const rowElements = new Map<string, HTMLElement>();
+const playingDots = new Map<string, HTMLElement>();
+let searchQuery = "";
 let heroArt: ReturnType<typeof artwork> | undefined;
 let heroStation: string | undefined;
 const root = document.querySelector<HTMLElement>("#app")!;
@@ -45,8 +49,20 @@ function btn(label: string, text: string, click: () => void, className = "") {
   return b;
 }
 const header = el("header");
+const identity = el("div", "", "identity");
+const brandMark = el("span", "◉", "brand-mark");
 const brand = el("a", "모퉁이 라디오", "brand");
 brand.href = "https://devsejong.github.io/motungi-radio/";
+identity.append(brandMark, brand, el("span", "웹 미리보기", "badge"));
+const headerDescription = el(
+  "span",
+  "좋아하는 한국 라디오를 한곳에서 무료로.",
+  "header-description",
+);
+const download = el("a", "앱 다운로드", "download-link");
+download.href = "https://devsejong.github.io/motungi-radio/#downloads";
+download.target = "_blank";
+download.rel = "noopener noreferrer";
 const theme = btn(
   "화면 테마 변경",
   "◐",
@@ -58,7 +74,7 @@ const theme = btn(
   },
   "icon",
 );
-header.append(brand, el("span", "WEB · 미리보기", "badge"), theme);
+header.append(identity, headerDescription, download, theme);
 const intro = el("section", "", "intro");
 intro.append(
   el("p", "화면 한켠에, 늘 함께", "eyebrow"),
@@ -116,6 +132,16 @@ const drawer = el("div", "", "drawer");
 drawer.id = "channels";
 const heading = el("div", "", "list-heading");
 heading.append(el("strong", "채널"), el("span", "방송사에서 직접 연결"));
+const searchLabel = el("label", "채널 또는 프로그램 검색", "search-label");
+const search = el("input", "", "search");
+search.type = "search";
+search.placeholder = "채널·프로그램 찾기";
+search.ariaLabel = "채널 또는 프로그램 검색";
+search.addEventListener("input", () => {
+  searchQuery = search.value;
+  renderSearch();
+});
+searchLabel.append(search);
 const list = el("div", "", "list");
 list.setAttribute("role", "list");
 const rows = new Map<string, HTMLButtonElement>();
@@ -146,12 +172,20 @@ for (const s of stations) {
     ),
   );
   rowTitles.set(s.id, copy.querySelector("small")!);
+  const dot = el("span", "●", "playing-dot");
+  dot.ariaLabel = "실제 재생 중";
+  dot.hidden = true;
+  playingDots.set(s.id, dot);
+  copy.append(dot);
   choice.append(mark, copy);
   row.append(choice);
   list.append(row);
   rows.set(s.id, choice);
+  rowElements.set(s.id, row);
 }
-drawer.append(heading, list);
+const emptyState = el("p", "검색 결과가 없습니다.", "empty-state");
+emptyState.hidden = true;
+drawer.append(heading, searchLabel, list, emptyState);
 const toggle = btn(
   "채널 목록 표시 전환",
   "채널 닫기 ⌃",
@@ -164,7 +198,7 @@ const toggle = btn(
 );
 toggle.setAttribute("aria-controls", "channels");
 toggle.setAttribute("aria-expanded", "true");
-card.append(hero, controls, error, volumeLabel, drawer, toggle);
+card.append(hero, controls, error, volumeLabel);
 const footer = el("footer");
 footer.append(
   el(
@@ -178,7 +212,30 @@ footer.append(
   privacy,
   el("span", " · 웹 미리보기는 사용 통계를 전송하지 않습니다."),
 );
-root.append(header, intro, card, footer);
+const workspace = el("section", "", "workspace");
+workspace.append(card, drawer, toggle);
+root.append(header, intro, workspace, footer);
+const desktopLayout = window.matchMedia("(min-width: 840px)");
+let mobileDrawerHidden = false;
+function syncDrawerForViewport() {
+  if (desktopLayout.matches) {
+    drawer.hidden = false;
+    toggle.hidden = true;
+  } else {
+    drawer.hidden = mobileDrawerHidden;
+    toggle.hidden = false;
+    toggle.textContent = mobileDrawerHidden ? "채널 펼치기 ⌄" : "채널 닫기 ⌃";
+    toggle.setAttribute("aria-expanded", String(!mobileDrawerHidden));
+  }
+}
+desktopLayout.addEventListener("change", syncDrawerForViewport);
+syncDrawerForViewport();
+toggle.onclick = () => {
+  mobileDrawerHidden = !mobileDrawerHidden;
+  drawer.hidden = mobileDrawerHidden;
+  toggle.textContent = mobileDrawerHidden ? "채널 펼치기 ⌄" : "채널 닫기 ⌃";
+  toggle.setAttribute("aria-expanded", String(!mobileDrawerHidden));
+};
 function move(direction: number) {
   const i = playable.findIndex((s) => s.id === player.state.stationId);
   const s =
@@ -217,8 +274,18 @@ player.subscribe((state) => {
           : "재생 버튼을 눌러 시작하세요.";
   error.hidden = !state.error;
   error.textContent = state.error?.message || "";
-  for (const [id, b] of rows)
+  for (const [id, b] of rows) {
     b.setAttribute("aria-pressed", String(id === state.stationId));
+    playingDots.get(id)!.hidden = !(
+      id === state.stationId && state.status === "playing"
+    );
+    rowElements
+      .get(id)!
+      .classList.toggle(
+        "is-playing",
+        id === state.stationId && state.status === "playing",
+      );
+  }
 });
 document.documentElement.dataset.theme =
   saved.theme === "dark" ? "dark" : "light";
@@ -244,6 +311,22 @@ function renderPrograms() {
       (supported(s.providerId) ? "실시간 방송" : "공식 홈페이지에서 청취");
     text.title = p?.title || "";
   }
+  renderSearch();
+}
+function renderSearch() {
+  const matches = new Set(
+    searchStations(
+      stations,
+      searchQuery,
+      new Map([...programs].map(([id, program]) => [id, program.title])),
+    ).map((station) => station.id),
+  );
+  let visible = 0;
+  for (const [id, row] of rowElements) {
+    row.hidden = !matches.has(id);
+    if (!row.hidden) visible++;
+  }
+  emptyState.hidden = visible !== 0;
 }
 const stopPrograms = watchPrograms((value) => {
   programs = value;

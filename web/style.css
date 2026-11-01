@@ -31,7 +31,7 @@ body {
   margin: 0;
 }
 #app {
-  max-width: 520px;
+  max-width: 1200px;
   margin: auto;
   padding: 24px 20px;
 }
@@ -43,6 +43,35 @@ header {
 .brand {
   font-weight: 750;
   color: inherit;
+  text-decoration: none;
+}
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 19px;
+}
+.header-description {
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 12px;
+}
+.download-link {
+  margin-left: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--ink);
+  font-size: 12px;
   text-decoration: none;
 }
 .badge {
@@ -213,6 +242,44 @@ input {
   background: var(--selected);
   color: var(--accent);
 }
+.row {
+  border-bottom: 1px solid var(--line);
+}
+.row:last-child {
+  border-bottom: 0;
+}
+.row.is-playing .choice[aria-pressed="true"] {
+  box-shadow: inset 3px 0 var(--accent);
+}
+.playing-dot {
+  display: inline-block;
+  color: #29976a;
+  font-size: 9px;
+  margin-top: 3px;
+}
+.search-label {
+  display: block;
+  padding: 0 12px 12px;
+  font-size: 0;
+}
+.search {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+.empty-state {
+  padding: 18px 12px;
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
 .mark {
   width: 38px;
   height: 38px;
@@ -322,6 +389,9 @@ footer a {
   height: 100%;
   object-fit: cover;
 }
+.hero-art img {
+  object-fit: contain;
+}
 .artwork img.wide {
   object-fit: contain;
 }
@@ -376,6 +446,124 @@ footer a {
 .art {
   width: 88px;
   height: 88px;
+}
+@media (min-width: 840px) {
+  header .icon { margin-left: 0; }
+  #app {
+    padding: 22px 28px;
+  }
+  header {
+    min-height: 46px;
+  }
+  .intro {
+    display: none;
+  }
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+    grid-template-areas: "channels player";
+    align-items: start;
+    gap: 22px;
+    margin-top: 28px;
+  }
+  .drawer {
+    grid-area: channels;
+    min-width: 0;
+    border: 0;
+  }
+  .player {
+    grid-area: player;
+    position: sticky;
+    top: 20px;
+    overflow: visible;
+    border-radius: 14px;
+  }
+  .hero {
+    display: block;
+    padding: 20px;
+  }
+  .art {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 11px;
+    margin-bottom: 18px;
+  }
+  h2 {
+    font-size: 22px;
+  }
+  .status,
+  .official,
+  .program-title {
+    font-size: 12px;
+  }
+  .controls {
+    gap: 20px;
+    padding: 2px 20px 14px;
+  }
+  .volume {
+    padding: 6px 22px 22px;
+  }
+  .list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 14px;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+  }
+  .list-heading {
+    padding: 0 0 10px;
+    font-size: 14px;
+  }
+  .search-label {
+    padding: 0 0 12px;
+  }
+  .choice {
+    min-height: 58px;
+    padding: 5px 8px;
+    border-radius: 8px;
+  }
+  .mark {
+    width: 38px;
+    height: 38px;
+  }
+  .copy strong {
+    font-size: 13px;
+  }
+  .copy small {
+    font-size: 10px;
+  }
+  .toggle {
+    display: none;
+  }
+  footer {
+    margin-top: 22px;
+  }
+}
+@media (max-width: 839px) {
+  #app {
+    max-width: 520px;
+  }
+  .workspace {
+    display: flex;
+    flex-direction: column;
+  }
+  .player {
+    order: 0;
+    width: 100%;
+  }
+  .drawer {
+    order: 1;
+    width: 100%;
+  }
+  .toggle {
+    order: 2;
+  }
+  .header-description,
+  .download-link {
+    display: none;
+  }
 }
 @media (max-width: 360px) {
   .art {
