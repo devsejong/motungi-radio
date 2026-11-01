@@ -2,6 +2,13 @@ import { PlayerController } from "../src/features/player/controller";
 import { HtmlAudioTransport } from "../src/features/player/transport";
 import { stations, supported, resolve } from "./streams";
 import "./style.css";
+import { watchPrograms, type Program } from "./programs";
+import { artwork } from "./artwork";
+let programs = new Map<string, Program>();
+const rowArt = new Map<string, ReturnType<typeof artwork>>();
+const rowTitles = new Map<string, HTMLElement>();
+let heroArt: ReturnType<typeof artwork> | undefined;
+let heroStation: string | undefined;
 const root = document.querySelector<HTMLElement>("#app")!;
 const playable = stations.filter((s) => supported(s.providerId));
 let saved: { lastStationId?: string; volume?: number; theme?: string } = {};
@@ -69,7 +76,9 @@ const title = el("h2");
 const official = el("a", "공식 홈페이지 ↗", "official");
 official.target = "_blank";
 official.rel = "noopener noreferrer";
-info.append(status, title, official);
+const programTitle = el("p", "", "program-title");
+programTitle.hidden = true;
+info.append(status, title, programTitle, official);
 hero.append(logo, info);
 const controls = el("div", "", "controls");
 const previous = btn("이전 채널", "‹", () => move(-1), "nav");
@@ -125,7 +134,9 @@ for (const s of stations) {
     },
     "choice",
   );
-  const mark = el("span", s.providerId.toUpperCase(), "mark");
+  const cover = artwork(s, "mark");
+  const mark = cover.element;
+  rowArt.set(s.id, cover);
   const copy = el("span", "", "copy");
   copy.append(
     el("strong", s.name),
@@ -134,6 +145,7 @@ for (const s of stations) {
       supported(s.providerId) ? "실시간 방송" : "공식 홈페이지에서 청취",
     ),
   );
+  rowTitles.set(s.id, copy.querySelector("small")!);
   choice.append(mark, copy);
   row.append(choice);
   list.append(row);
@@ -157,7 +169,7 @@ const footer = el("footer");
 footer.append(
   el(
     "p",
-    "브라우저·지역에 따라 재생이 제한될 수 있어요. 현재 프로그램과 편성표는 공식 홈페이지에서 확인해 주세요.",
+    "브라우저·지역에 따라 재생이 제한될 수 있어요. 프로그램 정보는 방송사 제공 기준이며, 편성표는 공식 홈페이지에서 확인해 주세요.",
   ),
 );
 const privacy = el("a", "개인정보처리방침");
@@ -182,7 +194,12 @@ function move(direction: number) {
 player.subscribe((state) => {
   const s = stations.find((s) => s.id === state.stationId);
   title.textContent = s?.name || "채널을 선택하세요";
-  logo.textContent = s?.providerId.toUpperCase() || "FM";
+  if (s && heroStation !== s.id) {
+    heroStation = s.id;
+    heroArt = artwork(s, "hero-art");
+    logo.replaceChildren(heroArt.element);
+  }
+  renderPrograms();
   official.href =
     s?.officialPageUrl || "https://devsejong.github.io/motungi-radio/";
   play.disabled = !s || !supported(s.providerId);
@@ -211,4 +228,28 @@ player.restore(
     : playable[0].id,
   Number(volume.value),
 );
-window.addEventListener("pagehide", () => player.stop());
+function renderPrograms() {
+  const id = player.state.stationId;
+  const current = id ? programs.get(id) : undefined;
+  heroArt?.update(current);
+  programTitle.textContent = current?.title || "";
+  programTitle.title = current?.title || "";
+  programTitle.hidden = !current;
+  for (const s of stations) {
+    const p = programs.get(s.id);
+    rowArt.get(s.id)?.update(p);
+    const text = rowTitles.get(s.id)!;
+    text.textContent =
+      p?.title ||
+      (supported(s.providerId) ? "실시간 방송" : "공식 홈페이지에서 청취");
+    text.title = p?.title || "";
+  }
+}
+const stopPrograms = watchPrograms((value) => {
+  programs = value;
+  renderPrograms();
+});
+window.addEventListener("pagehide", (event) => {
+  player.stop();
+  if (!event.persisted) stopPrograms();
+});

@@ -25,15 +25,13 @@ describe("browser stream boundaries", () => {
   it("does not return malicious URLs from official APIs", async () => {
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(
-            JSON.stringify({
-              channel_item: [{ service_url: "https://evil.test/live.m3u8" }],
-            }),
-          ),
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            channel_item: [{ service_url: "https://evil.test/live.m3u8" }],
+          }),
         ),
+      ),
     );
     expect((await resolve("kbs-21", new AbortController().signal)).ok).toBe(
       false,

@@ -7,8 +7,6 @@
     "../src/shared/contracts.ts"
   ],
   "compilerOptions": {
-    "types": [
-      "vite/client"
-    ]
+    "types": ["vite/client"]
   }
 }
