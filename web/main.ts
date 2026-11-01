@@ -213,27 +213,14 @@ footer.append(
   el("span", " · 웹 미리보기는 사용 통계를 전송하지 않습니다."),
 );
 const workspace = el("section", "", "workspace");
-workspace.append(card, drawer, toggle);
-const downloads = el("aside", "", "download-rails");
-downloads.ariaLabel = "PC 앱 다운로드";
-function downloadPanel(platform: string, symbol: string, description: string, href: string, className: string) {
-  const panel = el("section", "", `download-panel ${className}`);
-  const icon = el("span", symbol, "platform-symbol"); icon.ariaHidden = "true";
-  const link = el("a", `${platform} 다운로드 ↓`, "platform-download");
-  link.href = href;
-  if (platform === "Windows") {link.target = "_blank"; link.rel = "noopener noreferrer";}
-  panel.append(icon, el("p", "화면 한켠에,", "download-kicker"), el("h2", `${platform}에서도\n가볍게.`), el("p", description, "download-description"), link);
-  return panel;
-}
-const macPanel = downloadPanel("Mac", "⌘", "메뉴 막대에서\n좋아하는 방송을 바로.", "https://github.com/devsejong/motungi-radio/releases/download/v0.2.14/motungi-radio-0.2.14-macos-arm64.dmg", "download-mac");
-macPanel.append(el("small", "Apple Silicon · M 시리즈", "download-detail"));
-const intel = el("a", "Intel Mac용", "download-secondary");
-intel.href = "https://github.com/devsejong/motungi-radio/releases/download/v0.2.14/motungi-radio-0.2.14-macos-x64.dmg";
-macPanel.append(intel);
-const windowsPanel = downloadPanel("Windows", "⊞", "작업 표시줄에서\n편하게 채널을 바꿔요.", "https://apps.microsoft.com/detail/9p5rr68464sx?hl=ko-KR&gl=KR", "download-windows");
-windowsPanel.append(el("small", "Microsoft Store에서 설치", "download-detail"));
-downloads.append(macPanel, windowsPanel);
-root.append(header, intro, workspace, downloads, footer);
+const playerPanel = el("div", "", "player-panel");
+const downloadPage = el("a", "앱 다운로드 페이지로 이동 ↗", "player-download");
+downloadPage.href = "https://devsejong.github.io/motungi-radio/#downloads";
+downloadPage.target = "_blank";
+downloadPage.rel = "noopener noreferrer";
+playerPanel.append(card, downloadPage);
+workspace.append(playerPanel, drawer, toggle);
+root.append(header, intro, workspace, footer);
 const desktopLayout = window.matchMedia("(min-width: 840px)");
 let mobileDrawerHidden = false;
 function syncDrawerForViewport() {
