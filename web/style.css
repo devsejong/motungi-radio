@@ -31,7 +31,7 @@ body {
   margin: 0;
 }
 #app {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: auto;
   padding: 24px 20px;
 }
@@ -460,11 +460,11 @@ footer a {
   }
   .workspace {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
-    grid-template-areas: "channels player";
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+    grid-template-areas: "player channels";
     align-items: start;
-    gap: 22px;
-    margin-top: 28px;
+    gap: 32px;
+    margin-top: 32px;
   }
   .drawer {
     grid-area: channels;
