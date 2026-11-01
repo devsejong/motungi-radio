@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "./*.ts",
+    "../src/features/player/controller.ts",
+    "../src/features/player/transport.ts",
+    "../src/shared/contracts.ts"
+  ],
+  "compilerOptions": {
+    "types": [
+      "vite/client"
+    ]
+  }
+}
