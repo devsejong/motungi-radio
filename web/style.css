@@ -31,7 +31,7 @@ body {
   margin: 0;
 }
 #app {
-  max-width: 920px;
+  max-width: 720px;
   margin: auto;
   padding: 24px 20px;
 }
@@ -460,10 +460,10 @@ footer a {
   }
   .workspace {
     display: grid;
-    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas: "player channels";
     align-items: start;
-    gap: 32px;
+    gap: 24px;
     margin-top: 32px;
   }
   .drawer {
@@ -574,3 +574,23 @@ footer a {
     font-size: 11px;
   }
 }
+
+/* Keep the listening surface narrow; downloads live in the outer margins. */
+.header-description, .download-link {display:none;}
+header .icon {margin-left:auto;}
+.download-rails {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:32px;}
+.download-panel {min-width:0;padding:20px 0;border-top:1px solid var(--line);}
+.platform-symbol {display:block;font-size:30px;color:var(--accent);margin-bottom:22px;}
+.download-kicker {font-size:12px;color:var(--muted);margin:0 0 8px;}
+.download-panel h2 {white-space:pre-line;font-size:23px;line-height:1.4;margin:0 0 14px;}
+.download-description {white-space:pre-line;font-size:12px;line-height:1.8;color:var(--muted);margin:0 0 22px;}
+.platform-download {display:block;text-align:center;background:var(--accent);color:var(--surface);text-decoration:none;font-size:12px;font-weight:650;padding:13px 8px;border-radius:10px;}
+.download-detail {display:block;font-size:10px;color:var(--muted);line-height:1.5;margin-top:12px;}
+.download-secondary {display:inline-block;font-size:10px;color:var(--muted);margin-top:8px;text-underline-offset:3px;}
+@media(min-width:1180px){
+ .download-rails {display:contents;}
+ .download-panel {position:fixed;top:160px;width:176px;border:0;padding:0;}
+ .download-mac {left:calc(50% - 560px);}
+ .download-windows {right:calc(50% - 560px);}
+}
+@media(max-width:839px){.download-panel h2{font-size:20px;}.download-rails{gap:18px;}}
