@@ -328,13 +328,20 @@ p {
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 4px 3px;
-  border-radius: 9px;
-  min-height: 58px;
+  padding: 3px 5px;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  min-height: 54px;
+  margin-bottom: 3px;
+  transition: background 140ms ease;
 }
 .station.selected {
   background: var(--selected);
+  box-shadow: none;
 }
+.station:not(.selected):hover { background: var(--bg); }
+.station-choice:hover { background: transparent; }
 .station-choice {
   flex: 1;
   min-width: 0;
@@ -344,12 +351,13 @@ p {
   display: flex;
   gap: 9px;
   align-items: center;
-  padding: 5px;
+  padding: 3px;
 }
 .thumbnail {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 .thumbnail .cover-mark {
   font-size: 10px;
@@ -369,15 +377,18 @@ p {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 100%;
 }
 .schedule-button {
   font-size: 10px;
-  padding: 7px 4px;
-  border: 0;
+  padding: 7px 8px;
+  margin-right: 3px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
   background: transparent;
   color: var(--muted);
 }
+.station.selected .station-copy strong { color: var(--accent); }
 .channel-enabled {
   font-size: 18px;
   width: 30px;
@@ -974,7 +985,7 @@ main { padding-left: 8px; padding-right: 8px; }
 }
 
 .channel-list-heading { display:flex; align-items:center; justify-content:space-between; margin:12px 4px 8px; }
-.channel-list-heading strong { font-size:12px; }
+.channel-list-heading strong { font-size:13px; letter-spacing:-.2px; }
 .channel-edit-button { padding:6px 10px; font-size:11px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); }
 .channel-edit-button[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--on); }
 .channel-edit-help { margin:0 4px 12px; color:var(--muted); font-size:11px; line-height:1.6; word-break:keep-all; }
@@ -983,4 +994,43 @@ main { padding-left: 8px; padding-right: 8px; }
 .channel-skip-badge { display:inline-block; font-size:9px; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:4px; padding:1px 4px; margin-top:4px; line-height:1.4; }
 .channel-empty-navigation { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px; margin:4px 0 8px; border-radius:8px; background:var(--selected); color:var(--ink); font-size:11px; }
 .channel-empty-navigation button { font-size:11px; color:var(--accent); border:0; background:transparent; padding:3px; }
-.channel-list-heading { position:sticky; top:0; z-index:2; background:var(--bg); padding:8px 0; margin-top:4px; }
+.channel-list-heading { position:sticky; top:0; z-index:2; background:var(--bg); padding:10px 0; margin-top:4px; }
+.channel-editing .thumbnail { width:36px; height:36px; border-radius:8px; }
+.channel-editing .station-choice { gap:8px; }
+.channel-editing .channel-include { margin-right:22px; }
+@media (prefers-reduced-motion: reduce) { .station { transition:none; } }
+
+/* The list is a drawer between the player and its fixed bottom handle. */
+.shell:not(.panel-open):not(.mini-player) .now-playing {
+  margin-bottom: 0;
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+}
+.shell > .channel-visibility {
+  width: auto;
+  margin: 0 8px 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.shell:not(.panel-open):not(.mini-player):not(.channels-collapsed) main {
+  margin: 0 8px;
+  padding: 0 8px 8px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  background: var(--surface);
+  overscroll-behavior: contain;
+  animation: channel-drawer-open 220ms ease-out;
+}
+.shell:not(.panel-open) .channel-list-heading {
+  background: var(--surface);
+  margin: 0;
+  padding: 6px 2px;
+}
+@keyframes channel-drawer-open {
+  from { clip-path: inset(0 0 100% 0); transform: translateY(-8px); }
+  to { clip-path: inset(0); transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell:not(.panel-open):not(.mini-player):not(.channels-collapsed) main { animation: none; }
+}

@@ -1,6 +1,6 @@
 [package]
 name = "motungi-radio"
-version = "0.2.13"
+version = "0.2.14"
 description = "모퉁이 라디오 — 한국 채널 메뉴 막대·트레이 플레이어"
 edition = "2021"
 license = "MIT"

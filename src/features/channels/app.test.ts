@@ -146,7 +146,7 @@ it("keeps playback through settings, schedule and channel-list transitions", asy
   expect(
     root.querySelector(".channel-visibility")?.getAttribute("aria-expanded"),
   ).toBe("false");
-  expect(root.querySelector(".now-playing")?.lastElementChild).toBe(
+  expect(root.querySelector(".shell")?.lastElementChild).toBe(
     root.querySelector(".channel-visibility"),
   );
   expect(root.querySelector('button[aria-label="미니 플레이어"]')).toBeNull();
@@ -163,6 +163,11 @@ it("keeps playback through settings, schedule and channel-list transitions", asy
   click("돌아가기");
   await tick();
   expect(root.querySelector(".shell.channels-collapsed")).toBeTruthy();
+  click("채널 목록 표시 전환");
+  await tick();
+  expect(root.querySelector(".channel-visibility")?.textContent).toContain("채널 닫기");
+  expect(root.querySelector(".channel-visibility")?.previousElementSibling).toBe(root.querySelector("main"));
+  expect(root.querySelector(".shell.channels-collapsed")).toBeNull();
   expect(mock.stop).toHaveBeenCalledTimes(stops);
 });
 it("keeps volume DOM and focus through saves and metadata refresh; remembers appearance", async () => {

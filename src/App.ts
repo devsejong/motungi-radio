@@ -317,8 +317,7 @@ export async function mountApp(root: HTMLElement) {
   );
   channelToggle.setAttribute("aria-controls", "channel-panel");
   main.id = "channel-panel";
-  hero.append(channelToggle);
-  shell.append(header, hero, main);
+  shell.append(header, hero, main, channelToggle);
   const welcome = node("section", undefined, "welcome");
   welcome.setAttribute("aria-label", "모퉁이 라디오 시작 안내");
   welcome.hidden = true;
@@ -429,7 +428,7 @@ export async function mountApp(root: HTMLElement) {
         ? Math.max(
             200,
             header.offsetHeight
-              ? Math.ceil(header.offsetHeight + hero.offsetHeight + 16)
+              ? Math.ceil(header.offsetHeight + hero.offsetHeight + channelToggle.offsetHeight + 16)
               : 240,
           )
         : 640;
@@ -558,8 +557,8 @@ export async function mountApp(root: HTMLElement) {
     shell.classList.toggle("channels-collapsed", compact);
     channelToggle.hidden = panel !== "channels";
     channelToggleLabel.textContent = channelsVisible
-      ? "채널 접기"
-      : "채널 보기";
+      ? "채널 닫기"
+      : "채널 펼치기";
     channelToggle.setAttribute("aria-expanded", String(channelsVisible));
     shell.classList.toggle("panel-open", panel !== "channels");
     if (
