@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02",
+  "title": "Design System: Motungi Radio Web",
+  "extensions": {
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "840px"
+      },
+      {
+        "name": "compact",
+        "value": "360px"
+      }
+    ],
+    "motion": [
+      {
+        "name": "playback-meter",
+        "value": "800ms ease-in-out alternate",
+        "purpose": "Only while actual playback is active; disabled by reduced motion."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Download",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Prominent link below player",
+      "html": "<a class=\"download\" href=\"https://devsejong.github.io/motungi-radio/#downloads\">PC 앱 다운로드</a>",
+      "css": ".download{display:block;background:#334fbe;color:#fff;border-radius:10px;padding:14px 18px;font:600 14px system-ui;text-decoration:none}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Quiet listening library",
+    "overview": "Programme art and a single playback action, with a two-column station catalogue.",
+    "rules": [
+      {
+        "name": "Quiet startup",
+        "body": "Never autoplay."
+      }
+    ],
+    "dos": [
+      "Keep the desktop-download action beneath the player."
+    ],
+    "donts": [
+      "Do not add decorative interface instruments."
+    ]
+  }
+}
