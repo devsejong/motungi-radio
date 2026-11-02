@@ -858,3 +858,88 @@ footer .footer-note {
     position: relative;
   }
 }
+.download-area {
+  margin-top: 28px;
+}
+.download-benefit {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+.download-area .player-download {
+  margin-top: 0;
+}
+@media (min-width: 840px) {
+  #app {
+    height: 100dvh;
+    min-height: 640px;
+    display: grid;
+    grid-template-rows: 64px minmax(0, 1fr) 64px;
+    padding: 16px 32px;
+  }
+  header {
+    height: 64px;
+    padding-bottom: 0;
+  }
+  .workspace {
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 24px 0;
+    align-items: center;
+  }
+  .player-panel {
+    position: static;
+    align-self: center;
+  }
+  .drawer {
+    position: static;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+  }
+  .channel-scroll {
+    flex: 1;
+    min-height: 0;
+  }
+  footer {
+    height: 64px;
+    margin: 0;
+    padding-top: 16px;
+    align-self: end;
+  }
+  footer {
+    position: relative;
+  }
+  footer details[open] {
+    position: absolute;
+    left: 94px;
+    bottom: 32px;
+    z-index: 2;
+    width: min(380px, 70vw);
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+  footer details[open] p {
+    position: static;
+    margin: 12px 0 0;
+  }
+}
+@media (min-width: 840px) and (max-height: 720px) {
+  .art {
+    height: 154px;
+  }
+  .hero {
+    gap: 16px;
+  }
+  .download-area {
+    margin-top: 20px;
+  }
+  .status {
+    margin-top: 10px;
+  }
+}

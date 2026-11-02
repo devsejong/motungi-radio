@@ -243,7 +243,14 @@ downloadPage.replaceChildren(
   document.createTextNode("PC 앱 다운로드"),
   icon("external"),
 );
-playerPanel.append(card, downloadPage);
+const downloadIntro = el(
+  "p",
+  "메뉴 막대·트레이에서 바로 열고, 미니 모드로 더 작게 들어보세요.",
+  "download-benefit",
+);
+const downloadArea = el("div", "", "download-area");
+downloadArea.append(downloadIntro, downloadPage);
+playerPanel.append(card, downloadArea);
 workspace.append(playerPanel, drawer, toggle);
 root.append(header, workspace, footer);
 const desktopLayout = window.matchMedia("(min-width: 840px)");

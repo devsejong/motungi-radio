@@ -56,3 +56,5 @@ A 56px square play/pause action beside the programme title; no previous/next, se
 
 ## Do's and Don'ts
 Preserve silent startup, original images, keyboard focus and real playback indicators. Never add decorative gradients, nested cards, fake frequencies, illustrative data or autoplay. Reduced-motion users receive a static playback indicator.
+
+Desktop follow-up: at widths from 840px, the app uses a viewport-height shell with symmetric 64px header/footer tracks. The full player and download area are vertically centered in the remaining space; channel browsing alone scrolls. Minimum shell height 640px prevents clipping on short screens. Download benefit copy precedes the CTA.
