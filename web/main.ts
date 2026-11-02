@@ -2,6 +2,7 @@ import { PlayerController } from "../src/features/player/controller";
 import { HtmlAudioTransport } from "../src/features/player/transport";
 import { stations, supported, resolve } from "./streams";
 import "./style.css";
+import appIcon from "../src-tauri/icons/128x128.png";
 import { watchPrograms, type Program } from "./programs";
 import { artwork } from "./artwork";
 let programs = new Map<string, Program>();
@@ -238,18 +239,27 @@ const downloadPage = el("a", "앱 다운로드 페이지로 이동 ↗", "player
 downloadPage.href = "https://devsejong.github.io/motungi-radio/#downloads";
 downloadPage.target = "_blank";
 downloadPage.rel = "noopener noreferrer";
-downloadPage.replaceChildren(
-  icon("download"),
-  document.createTextNode("PC 앱 다운로드"),
+const bannerIcon = el("img", "", "download-app-icon");
+bannerIcon.src = appIcon;
+bannerIcon.alt = "";
+bannerIcon.width = 48;
+bannerIcon.height = 48;
+const bannerCopy = el("span", "", "download-banner-copy");
+const bannerAction = el("span", "", "download-banner-action");
+bannerAction.append(
+  document.createTextNode("무료 PC 앱 다운로드"),
   icon("external"),
 );
-const downloadIntro = el(
-  "p",
-  "메뉴 막대·트레이에서 바로 열고, 미니 모드로 더 작게 들어보세요.",
-  "download-benefit",
+bannerCopy.append(
+  el("strong", "모퉁이 라디오 PC 앱"),
+  el("span", "메뉴 막대·트레이에서 더 간편하게.", "download-banner-benefit"),
+  bannerAction,
 );
+downloadPage.replaceChildren(bannerIcon, bannerCopy);
+downloadPage.ariaLabel =
+  "모퉁이 라디오 무료 PC 앱 다운로드 페이지로 이동, 새 창";
 const downloadArea = el("div", "", "download-area");
-downloadArea.append(downloadIntro, downloadPage);
+downloadArea.append(downloadPage);
 playerPanel.append(card, downloadArea);
 workspace.append(playerPanel, drawer, toggle);
 root.append(header, workspace, footer);

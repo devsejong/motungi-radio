@@ -1034,3 +1034,76 @@ footer .footer-note {
     align-items: center;
   }
 }
+/* A compact app promotion: one linked banner, not a detached explanation and CTA. */
+.download-area .player-download {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 100px;
+  padding: 16px 18px;
+  background: var(--selected);
+  color: var(--ink);
+  border-radius: 12px;
+  font-weight: 400;
+  text-align: left;
+}
+.download-area .player-download:hover {
+  background: var(--selected);
+  color: var(--ink);
+  filter: brightness(0.98);
+}
+.download-app-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.download-banner-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+.download-banner-copy strong {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: -0.02em;
+}
+.download-banner-benefit {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 17px;
+  text-wrap: pretty;
+}
+.download-banner-action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 650;
+  margin-top: 2px;
+}
+.download-area .download-banner-action svg {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+:root[data-theme="dark"] .download-area .player-download {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .download-area .player-download:hover {
+  filter: brightness(1.08);
+}
+@media (max-width: 359px) {
+  .download-area .player-download {
+    padding: 14px;
+    gap: 12px;
+  }
+  .download-app-icon {
+    width: 42px;
+    height: 42px;
+  }
+}
