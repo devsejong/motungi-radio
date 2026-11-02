@@ -966,3 +966,45 @@ footer .footer-note {
     gap: 5px;
   }
 }
+/* Center the listening surface itself; the download invitation sits below it. */
+@media (min-width: 840px) {
+  .player-panel {
+    position: relative;
+    align-self: center;
+  }
+  .download-area {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 24px;
+  }
+}
+@media (min-width: 840px) and (max-height: 680px) {
+  .player-panel {
+    transform: translateY(-12px);
+  }
+  .download-area {
+    margin-top: 16px;
+  }
+  .download-benefit {
+    font-size: 12px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+}
+@media (min-width: 840px) {
+  #app {
+    position: relative;
+  }
+  .player-panel {
+    position: absolute;
+    top: 50%;
+    left: 32px;
+    width: 360px;
+    transform: translateY(-50%);
+  }
+  .drawer {
+    grid-column: 2;
+  }
+}
