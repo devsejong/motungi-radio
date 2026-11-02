@@ -448,7 +448,9 @@ footer a {
   height: 88px;
 }
 @media (min-width: 840px) {
-  header .icon { margin-left: 0; }
+  header .icon {
+    margin-left: 0;
+  }
   #app {
     padding: 22px 28px;
   }
@@ -575,19 +577,201 @@ footer a {
   }
 }
 
-
-.header-description, .download-link {display:none;}
-header .icon {margin-left:auto;}
-.player-panel {min-width:0;}
-.player-download {display:block;text-align:center;padding:14px 8px;color:var(--muted);font-size:12px;text-decoration:none;text-underline-offset:3px;}
-.player-download:hover {color:var(--accent);text-decoration:underline;}
-@media(min-width:840px){
- .player-panel {grid-area:player;position:sticky;top:20px;}
- .player {position:static;}
- .hero {padding:16px 16px 10px;}
- .art {height:200px;aspect-ratio:auto;margin-bottom:14px;}
- .artwork img {object-fit:contain;}
- .controls {padding-bottom:10px;}
- .volume {padding-bottom:16px;}
+.header-description,
+.download-link {
+  display: none;
 }
-@media(max-width:839px){.player-panel{order:0;width:100%;}}
+header .icon {
+  margin-left: auto;
+}
+.player-panel {
+  min-width: 0;
+}
+.player-download {
+  display: block;
+  text-align: center;
+  padding: 14px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.player-download:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+@media (min-width: 840px) {
+  .player-panel {
+    grid-area: player;
+    position: sticky;
+    top: 20px;
+  }
+  .player {
+    position: static;
+  }
+  .hero {
+    padding: 16px 16px 10px;
+  }
+  .art {
+    height: 200px;
+    aspect-ratio: auto;
+    margin-bottom: 14px;
+  }
+  .artwork img {
+    object-fit: contain;
+  }
+  .controls {
+    padding-bottom: 10px;
+  }
+  .volume {
+    padding-bottom: 16px;
+  }
+}
+@media (max-width: 839px) {
+  .player-panel {
+    order: 0;
+    width: 100%;
+  }
+}
+
+/* Compact listening surface with a separate, scrollable station browser. */
+.info h2 {
+  margin: 5px 0 8px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+.program-title {
+  font-size: 12px;
+  color: var(--accent);
+  margin: 0 0 4px;
+}
+.status {
+  min-height: 16px;
+  margin-bottom: 7px;
+}
+.art,
+.mark {
+  background: var(--selected);
+  overflow: hidden;
+}
+.artwork img,
+.artwork img.wide {
+  object-fit: contain;
+}
+.copy {
+  flex: 1;
+}
+.controls {
+  gap: 12px;
+  align-items: start;
+}
+.controls .play {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+.nav-control {
+  width: 92px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+.nav-name {
+  display: block;
+  max-width: 100%;
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.choice:hover {
+  background: var(--selected);
+}
+.external-heading {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 18px 10px 7px;
+}
+.external-icon {
+  color: var(--muted);
+  font-size: 15px;
+}
+.channel-scroll {
+  max-height: 330px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+.list {
+  max-height: none;
+  overflow: visible;
+}
+.playing-dot {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 9px;
+  color: var(--accent);
+}
+.playing-dot i {
+  display: block;
+  width: 3px;
+  height: 13px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.playing-dot i:nth-child(2) {
+  height: 7px;
+}
+.playing-dot.error {
+  padding: 0;
+  color: #bd4159;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .playing-dot.playing i {
+    animation: meter 0.8s ease-in-out infinite alternate;
+  }
+  .playing-dot.playing i:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+  .playing-dot.playing i:nth-child(3) {
+    animation-delay: -0.6s;
+  }
+  @keyframes meter {
+    to {
+      transform: scaleY(0.35);
+    }
+  }
+}
+@media (min-width: 840px) {
+  .drawer {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 130px);
+    position: sticky;
+    top: 20px;
+  }
+  .channel-scroll {
+    min-height: 0;
+    max-height: none;
+  }
+  .list-heading,
+  .search-label {
+    flex-shrink: 0;
+  }
+  .art {
+    height: 200px;
+  }
+  .player .channel-logo strong {
+    font-size: 36px;
+  }
+  .player .channel-logo small {
+    font-size: 13px;
+  }
+}

@@ -94,7 +94,7 @@ official.target = "_blank";
 official.rel = "noopener noreferrer";
 const programTitle = el("p", "", "program-title");
 programTitle.hidden = true;
-info.append(status, title, programTitle, official);
+info.append(programTitle, title, status, official);
 hero.append(logo, info);
 const controls = el("div", "", "controls");
 const previous = btn("이전 채널", "‹", () => move(-1), "nav");
@@ -109,7 +109,13 @@ const play = btn(
   "play",
 );
 const next = btn("다음 채널", "›", () => move(1), "nav");
-controls.append(previous, play, next);
+const previousName = el("small", "", "nav-name");
+const nextName = el("small", "", "nav-name");
+const previousControl = el("div", "", "nav-control");
+const nextControl = el("div", "", "nav-control");
+previousControl.append(previous, previousName);
+nextControl.append(next, nextName);
+controls.append(previousControl, play, nextControl);
 const error = el("p", "", "error");
 error.setAttribute("role", "alert");
 error.hidden = true;
@@ -144,19 +150,23 @@ search.addEventListener("input", () => {
 searchLabel.append(search);
 const list = el("div", "", "list");
 list.setAttribute("role", "list");
+const externalHeading = el("h3", "공식 사이트에서 듣기 ↗", "external-heading");
+const externalList = el("div", "", "list external-list");
+externalList.setAttribute("role", "list");
+const channelScroll = el("div", "", "channel-scroll");
+channelScroll.tabIndex = 0;
+channelScroll.setAttribute("role", "region");
+channelScroll.ariaLabel = "채널 목록";
 const rows = new Map<string, HTMLButtonElement>();
 for (const s of stations) {
   const row = el("div", "", "row");
   row.setAttribute("role", "listitem");
   const choice = btn(
-    `${s.name} ${supported(s.providerId) ? "재생" : "선택"}`,
+    `${s.name} ${supported(s.providerId) ? "재생" : "공식 사이트에서 듣기, 새 창"}`,
     "",
     () => {
       if (supported(s.providerId)) void player.select(s.id);
-      else {
-        persist({ lastStationId: s.id });
-        player.restore(s.id, Number(volume.value));
-      }
+      else window.open(s.officialPageUrl, "_blank", "noopener,noreferrer");
     },
     "choice",
   );
@@ -172,20 +182,21 @@ for (const s of stations) {
     ),
   );
   rowTitles.set(s.id, copy.querySelector("small")!);
-  const dot = el("span", "●", "playing-dot");
+  const dot = el("span", "", "playing-dot");
   dot.ariaLabel = "실제 재생 중";
   dot.hidden = true;
   playingDots.set(s.id, dot);
-  copy.append(dot);
-  choice.append(mark, copy);
+  choice.append(mark, copy, dot);
+  if (!supported(s.providerId)) choice.append(el("span", "↗", "external-icon"));
   row.append(choice);
-  list.append(row);
+  (supported(s.providerId) ? list : externalList).append(row);
   rows.set(s.id, choice);
   rowElements.set(s.id, row);
 }
 const emptyState = el("p", "검색 결과가 없습니다.", "empty-state");
 emptyState.hidden = true;
-drawer.append(heading, searchLabel, list, emptyState);
+channelScroll.append(list, externalHeading, externalList, emptyState);
+drawer.append(heading, searchLabel, channelScroll);
 const toggle = btn(
   "채널 목록 표시 전환",
   "채널 닫기 ⌃",
@@ -278,13 +289,42 @@ player.subscribe((state) => {
         : s && !supported(s.providerId)
           ? "공식 홈페이지에서 들을 수 있어요"
           : "재생 버튼을 눌러 시작하세요.";
+  const index = playable.findIndex((item) => item.id === state.stationId);
+  const before =
+    playable[
+      index < 0
+        ? playable.length - 1
+        : (index - 1 + playable.length) % playable.length
+    ];
+  const after = playable[index < 0 ? 0 : (index + 1) % playable.length];
+  previousName.textContent = before.name;
+  nextName.textContent = after.name;
+  previousName.title = before.name;
+  nextName.title = after.name;
+  previous.ariaLabel = `이전 채널: ${before.name}`;
+  next.ariaLabel = `다음 채널: ${after.name}`;
   error.hidden = !state.error;
   error.textContent = state.error?.message || "";
   for (const [id, b] of rows) {
-    b.setAttribute("aria-pressed", String(id === state.stationId));
-    playingDots.get(id)!.hidden = !(
-      id === state.stationId && state.status === "playing"
+    if (supported(stations.find((station) => station.id === id)!.providerId))
+      b.setAttribute("aria-pressed", String(id === state.stationId));
+    const indicator = playingDots.get(id)!;
+    const active = id === state.stationId;
+    indicator.hidden = !(
+      active && ["playing", "loading", "error"].includes(state.status)
     );
+    indicator.className = "playing-dot " + (active ? state.status : "");
+    indicator.replaceChildren();
+    if (active && state.status === "playing") {
+      indicator.ariaLabel = "재생 중";
+      for (let i = 0; i < 3; i++) indicator.append(el("i"));
+    } else {
+      indicator.textContent = state.status === "loading" ? "연결 중" : "재시도";
+      indicator.ariaLabel =
+        state.status === "loading"
+          ? "방송 연결 중"
+          : "연결 실패, 재생 버튼으로 재시도";
+    }
     rowElements
       .get(id)!
       .classList.toggle(
@@ -305,8 +345,10 @@ function renderPrograms() {
   const id = player.state.stationId;
   const current = id ? programs.get(id) : undefined;
   heroArt?.update(current);
-  programTitle.textContent = current?.title || "";
-  programTitle.title = current?.title || "";
+  const station = stations.find((s) => s.id === id);
+  title.textContent = current?.title || station?.name || "채널을 선택하세요";
+  title.title = title.textContent;
+  programTitle.textContent = station?.name || "";
   programTitle.hidden = !current;
   for (const s of stations) {
     const p = programs.get(s.id);
@@ -332,6 +374,10 @@ function renderSearch() {
     row.hidden = !matches.has(id);
     if (!row.hidden) visible++;
   }
+  externalHeading.hidden = !stations.some(
+    (s) => !supported(s.providerId) && matches.has(s.id),
+  );
+  externalList.hidden = externalHeading.hidden;
   emptyState.hidden = visible !== 0;
 }
 const stopPrograms = watchPrograms((value) => {
