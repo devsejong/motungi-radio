@@ -2,6 +2,8 @@ import { PlayerController } from "../src/features/player/controller";
 import { HtmlAudioTransport } from "../src/features/player/transport";
 import { stations, supported, resolve } from "./streams";
 import "./style.css";
+import "./site.css";
+import { downloadView } from "./download-view";
 import appIcon from "../src-tauri/icons/128x128.png";
 import { watchPrograms, type Program } from "./programs";
 import { artwork } from "./artwork";
@@ -13,6 +15,7 @@ const playingDots = new Map<string, HTMLElement>();
 let heroArt: ReturnType<typeof artwork> | undefined;
 let heroStation: string | undefined;
 const root = document.querySelector<HTMLElement>("#app")!;
+const base = import.meta.env.BASE_URL;
 const playable = stations.filter((s) => supported(s.providerId));
 let saved: { lastStationId?: string; volume?: number; theme?: string } = {};
 try {
@@ -100,7 +103,7 @@ const identity = el("div", "", "identity");
 const brandMark = el("span", "", "brand-mark");
 brandMark.append(icon("radio"));
 const brand = el("a", "모퉁이 라디오", "brand");
-brand.href = "https://devsejong.github.io/motungi-radio/";
+brand.href = base;
 identity.append(brandMark, brand, el("span", "웹 미리보기", "badge"));
 const theme = btn(
   "화면 테마 변경",
@@ -114,7 +117,14 @@ const theme = btn(
   "icon",
 );
 theme.replaceChildren(icon("theme"));
-header.append(identity, theme);
+const navigation = el("nav", "", "site-tabs");
+navigation.ariaLabel = "주요 메뉴";
+const listenLink = el("a", "라디오 듣기");
+listenLink.href = base;
+const appLink = el("a", "PC 앱 다운로드");
+appLink.href = base + "download/";
+navigation.append(listenLink, appLink);
+header.append(identity, navigation, theme);
 const card = el("section", "", "player");
 card.ariaLabel = "라디오 플레이어";
 const hero = el("div", "", "hero");
@@ -230,14 +240,14 @@ help.append(
   ),
 );
 const privacy = el("a", "개인정보처리방침");
-privacy.href = "https://devsejong.github.io/motungi-radio/privacy.html";
+privacy.href = base + "privacy.html";
 footer.append(privacy, help);
-help.append(el("p", "웹 미리보기는 사용 통계를 전송하지 않습니다."));
+help.append(el("p", "방송 청취 기록은 통계로 전송하지 않습니다."));
 const workspace = el("section", "", "workspace");
 const playerPanel = el("div", "", "player-panel");
 const downloadPage = el("a", "앱 다운로드 페이지로 이동 ↗", "player-download");
-downloadPage.href = "https://devsejong.github.io/motungi-radio/#downloads";
-downloadPage.target = "_blank";
+downloadPage.href = base + "download/";
+
 downloadPage.rel = "noopener noreferrer";
 const bannerIcon = el("img", "", "download-app-icon");
 bannerIcon.src = appIcon;
@@ -256,13 +266,117 @@ bannerCopy.append(
   bannerAction,
 );
 downloadPage.replaceChildren(bannerIcon, bannerCopy);
-downloadPage.ariaLabel =
-  "모퉁이 라디오 무료 PC 앱 다운로드 페이지로 이동, 새 창";
+downloadPage.ariaLabel = "모퉁이 라디오 무료 PC 앱 다운로드 페이지로 이동";
 const downloadArea = el("div", "", "download-area");
 downloadArea.append(downloadPage);
 playerPanel.append(card, downloadArea);
 workspace.append(playerPanel, drawer, toggle);
-root.append(header, workspace, footer);
+const downloadContent = downloadView(base);
+root.append(header, workspace, downloadContent, footer);
+let viewingDownload = false;
+let analyticsLoaded = false;
+function showRoute() {
+  viewingDownload = location.pathname
+    .replace(/\/index\.html$/, "/")
+    .endsWith("/download/");
+  root.classList.toggle("download-active", viewingDownload);
+  workspace.hidden = viewingDownload;
+  downloadContent.hidden = !viewingDownload;
+  listenLink.toggleAttribute("aria-current", !viewingDownload);
+  appLink.toggleAttribute("aria-current", viewingDownload);
+  if (!viewingDownload) listenLink.setAttribute("aria-current", "page");
+  else appLink.setAttribute("aria-current", "page");
+  document.title = viewingDownload
+    ? "PC 앱 다운로드 · 모퉁이 라디오"
+    : "모퉁이 라디오 · 웹 플레이어";
+  if (viewingDownload && !analyticsLoaded) {
+    analyticsLoaded = true;
+    const script = document.createElement("script");
+    script.src = base + "analytics.js";
+    document.head.append(script);
+  }
+}
+for (const link of [listenLink, appLink, brand, downloadPage]) {
+  link.addEventListener("click", (event) => {
+    if (
+      event.button ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    event.preventDefault();
+    history.pushState({}, "", link.href);
+    showRoute();
+  });
+}
+window.addEventListener("popstate", showRoute);
+if (location.hash === "#downloads")
+  history.replaceState({}, "", base + "download/");
+showRoute();
+const bannerSlides = [
+  ["모퉁이 라디오 PC 앱", "메뉴 막대·트레이에서 더 간편하게."],
+  ["작게 켜두고, 하던 일에 집중", "미니 모드로 필요한 조작만 가볍게."],
+  ["원하는 곳에, 원하는 만큼", "창 고정과 투명도로 편안하게 듣기."],
+];
+const bannerControls = el("div", "", "banner-controls");
+bannerControls.ariaLabel = "PC 앱 소개 배너";
+let bannerIndex = 0;
+let bannerPaused = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let bannerHover = false;
+function bannerSelect(index: number) {
+  bannerIndex = index;
+  bannerCopy.querySelector("strong")!.textContent = bannerSlides[index][0];
+  bannerCopy.querySelector(".download-banner-benefit")!.textContent =
+    bannerSlides[index][1];
+  bannerCopy.classList.remove("changing");
+  requestAnimationFrame(() => bannerCopy.classList.add("changing"));
+  [...bannerControls.querySelectorAll(".banner-dot")].forEach((dot, i) =>
+    dot.setAttribute("aria-pressed", String(i === index)),
+  );
+}
+bannerSlides.forEach((_, i) => {
+  const dot = btn(
+    `앱 소개 ${i + 1} 보기`,
+    "",
+    () => bannerSelect(i),
+    "banner-dot",
+  );
+  dot.setAttribute("aria-pressed", String(i === 0));
+  bannerControls.append(dot);
+});
+const pauseBanner = btn(
+  "배너 자동 전환 멈추기",
+  "",
+  () => {
+    bannerPaused = !bannerPaused;
+    pauseBanner.ariaLabel = bannerPaused
+      ? "배너 자동 전환 시작"
+      : "배너 자동 전환 멈추기";
+    pauseBanner.replaceChildren(icon(bannerPaused ? "play" : "stop"));
+  },
+  "banner-pause",
+);
+pauseBanner.replaceChildren(icon(bannerPaused ? "play" : "stop"));
+if (bannerPaused) pauseBanner.ariaLabel = "배너 자동 전환 시작";
+bannerControls.append(pauseBanner);
+downloadArea.append(bannerControls);
+downloadArea.onmouseenter = () => (bannerHover = true);
+downloadArea.onmouseleave = () => (bannerHover = false);
+const bannerTimer = window.setInterval(() => {
+  if (
+    !bannerPaused &&
+    !bannerHover &&
+    !viewingDownload &&
+    !document.hidden &&
+    !downloadArea.contains(document.activeElement)
+  )
+    bannerSelect((bannerIndex + 1) % bannerSlides.length);
+}, 6000);
+window.addEventListener("pagehide", (event) => {
+  if (!event.persisted) clearInterval(bannerTimer);
+});
 const desktopLayout = window.matchMedia("(min-width: 840px)");
 let mobileDrawerHidden = false;
 function syncDrawerForViewport() {

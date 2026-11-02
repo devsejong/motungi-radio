@@ -58,3 +58,6 @@ A 56px square play/pause action beside the programme title; no previous/next, se
 Preserve silent startup, original images, keyboard focus and real playback indicators. Never add decorative gradients, nested cards, fake frequencies, illustrative data or autoplay. Reduced-motion users receive a static playback indicator.
 
 Desktop follow-up: at widths from 840px, the app uses a viewport-height shell with symmetric 64px header/footer tracks. The full player and download area are vertically centered in the remaining space; channel browsing alone scrolls. Minimum shell height 640px prevents clipping on short screens. Download benefit copy precedes the CTA.
+
+## Integrated navigation and promotion
+The shared header uses two route links styled as tabs: 라디오 듣기 and PC 앱 다운로드. Route changes retain the audio controller. A compact three-slide app banner uses the existing app icon, one benefit and one action, with quiet pagination and an automatic-rotation pause control. Motion-reduction users start with automatic rotation off. Downloads reuse current app screenshots and OS links on the same neutral surfaces. Source styles for the download view are scoped beneath .download-view to avoid altering the player.

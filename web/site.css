@@ -1,0 +1,371 @@
+.site-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 4px;
+  background: var(--art);
+  border-radius: 9px;
+}
+.site-tabs a {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 13px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.site-tabs a[aria-current="page"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+header .icon {
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.badge {
+  display: none;
+}
+.banner-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.banner-dot {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: none;
+  padding: 6px;
+  cursor: pointer;
+}
+.banner-dot::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.banner-dot[aria-pressed="true"]::after {
+  background: var(--accent);
+}
+.banner-pause {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  background: none;
+  border: 0;
+  color: var(--muted);
+}
+.banner-pause svg {
+  width: 12px;
+  height: 12px;
+}
+.download-banner-copy {
+  animation: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .download-banner-copy.changing {
+    animation: banner-in 0.35s ease-out;
+  }
+  @keyframes banner-in {
+    from {
+      opacity: 0.4;
+      transform: translateX(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+#app.download-active {
+  height: auto;
+  min-height: 100dvh;
+  display: block;
+}
+.download-active .workspace {
+  display: none !important;
+}
+.download-active footer {
+  margin-top: 36px;
+  height: auto;
+}
+.download-view {
+  padding-top: 40px;
+}
+.download-view .symbols {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.download-view .hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+.download-view .hero-copy {
+  grid-column: 1/-1;
+}
+.download-view h1 {
+  font-size: 32px;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+}
+.download-view h1 em {
+  font-style: normal;
+}
+.download-view .hero-description {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 0 0 6px;
+}
+.download-view .hero-visual {
+  min-width: 0;
+}
+.download-view .feature-track {
+  display: flex;
+  overflow: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  outline-offset: 3px;
+}
+.download-view .feature-track::-webkit-scrollbar {
+  display: none;
+}
+.download-view .feature-slide {
+  min-width: 100%;
+  width: 100%;
+  scroll-snap-align: start;
+  margin: 0;
+}
+.download-view .feature-slide img {
+  display: block;
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+}
+.download-view .feature-slide figcaption {
+  font-size: 12px;
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 12px;
+}
+.download-view .carousel-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+.download-view .carousel-dots {
+  display: flex;
+  gap: 8px;
+}
+.download-view [data-slide] {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--line);
+}
+.download-view [data-slide][aria-pressed="true"] {
+  background: var(--accent);
+}
+.download-view .carousel-arrow {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--art);
+  font-size: 22px;
+}
+.download-view .downloads {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.download-view .download-button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  min-height: 88px;
+}
+.download-view .download-button svg {
+  width: 24px;
+  height: 24px;
+}
+.download-view .download-button svg:last-child {
+  margin-left: auto;
+  width: 18px;
+}
+.download-view .download-button strong {
+  display: block;
+  font-size: 16px;
+}
+.download-view .download-button small {
+  display: block;
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 5px;
+}
+.download-view .download-other {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.download-view .release-note,
+.download-view .install-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.download-view details {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.download-view svg {
+  display: inline-block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  vertical-align: middle;
+}
+.download-view [class*="apple"] svg {
+  fill: currentColor;
+}
+.download-view .download-secondary {
+  font-size: 12px;
+  color: var(--muted);
+}
+.download-view .download-notes {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.download-view .download-notes summary {
+  cursor: pointer;
+}
+@media (max-width: 839px) {
+  header {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .site-tabs {
+    order: 3;
+    width: 100%;
+    margin: 8px 0 0;
+  }
+  .site-tabs a {
+    flex: 1;
+    text-align: center;
+  }
+  header .icon {
+    margin-left: auto;
+  }
+  .download-view .hero {
+    grid-template-columns: 1fr;
+  }
+  .download-view .hero-copy {
+    grid-column: auto;
+  }
+  .download-view {
+    padding-top: 28px;
+  }
+  .download-view h1 {
+    font-size: 26px;
+  }
+  .download-view .feature-slide img {
+    height: 230px;
+  }
+  .download-view .hero-visual {
+    order: 2;
+  }
+}
+.download-view .screenshot-dark {
+  display: none !important;
+}
+:root[data-theme="dark"] .download-view .screenshot-light {
+  display: none !important;
+}
+:root[data-theme="dark"] .download-view .screenshot-dark {
+  display: block !important;
+}
+.download-view .feature-number {
+  display: none;
+}
+.download-view .feature-caption h2 {
+  font-size: 16px;
+  min-height: 0;
+  margin: 0 0 5px;
+}
+.download-view .feature-caption p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+.download-view figure {
+  margin: 0;
+}
+.download-view .secondary-download {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 18px;
+  line-height: 1.7;
+}
+.download-view .secondary-download svg {
+  width: 14px;
+  height: 14px;
+}
+.download-view .platform-note {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-top: 16px;
+}
+:root[data-theme="dark"] .download-view .download-button {
+  color: #171918;
+}
+.download-view .download-button .platform-icon {
+  fill: currentColor;
+  stroke: none;
+}
+.download-view .screenshot-stage {
+  height: 300px;
+  display: grid;
+  place-items: center;
+}
+.download-view .feature-slide img {
+  max-height: 300px;
+}
+.download-view .feature-slide {
+  flex-shrink: 0;
+}

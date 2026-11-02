@@ -2,7 +2,7 @@ name: 홈페이지 배포
 on:
   push:
     branches: [main]
-    paths: ['site/**', '.github/workflows/pages.yml']
+    paths: ['site/**', 'web/**', 'src/features/player/**', 'src/shared/contracts.ts', 'scripts/build-site.mjs', 'package*.json', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,9 +19,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --project web/tsconfig.json --noEmit
+      - run: node scripts/build-site.mjs
       - uses: actions/configure-pages@v6.0.0
       - uses: actions/upload-pages-artifact@v5.0.0
         with:
-          path: site
+          path: dist-site
       - uses: actions/deploy-pages@v5.0.1
         id: deployment
