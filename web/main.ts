@@ -119,7 +119,7 @@ card.ariaLabel = "라디오 플레이어";
 const hero = el("div", "", "hero");
 const logo = el("div", "FM", "art");
 const info = el("div", "", "info");
-const status = el("p", "재생 버튼을 눌러 시작하세요.", "status");
+const status = el("p", "", "status");
 status.setAttribute("role", "status");
 const title = el("h2");
 const official = el("a", "공식 홈페이지 ↗", "official");
@@ -295,14 +295,8 @@ player.subscribe((state) => {
   );
   play.ariaLabel =
     state.status === "playing" || state.status === "loading" ? "정지" : "재생";
-  status.textContent =
-    state.status === "playing"
-      ? "지금 듣는 중"
-      : state.status === "loading"
-        ? "방송 연결 중…"
-        : s && !supported(s.providerId)
-          ? "공식 홈페이지에서 들을 수 있어요"
-          : "재생 버튼을 눌러 시작하세요.";
+  status.textContent = state.status === "loading" ? "방송 연결 중…" : "";
+  status.hidden = state.status !== "loading";
   error.hidden = !state.error;
   error.textContent = state.error?.message || "";
   for (const [id, b] of rows) {
