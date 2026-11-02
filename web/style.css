@@ -1008,3 +1008,29 @@ footer .footer-note {
     grid-column: 2;
   }
 }
+/* Start artwork immediately beneath the station-section heading. */
+@media (min-width: 840px) {
+  .workspace {
+    align-items: start;
+  }
+  .list-heading {
+    min-height: 24px;
+    line-height: 24px;
+    margin-bottom: 18px;
+  }
+  .player-panel {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    transform: none;
+    align-self: start;
+    margin-top: 42px;
+  }
+}
+@media (min-width: 840px) {
+  .list-heading {
+    height: 24px;
+    align-items: center;
+  }
+}
