@@ -1107,3 +1107,26 @@ footer .footer-note {
     height: 42px;
   }
 }
+
+/* Keep the compact station grid readable at a glance. */
+.copy strong {
+  font-size: 13px;
+  line-height: 19px;
+}
+.copy small {
+  font-size: 11px;
+  line-height: 16px;
+}
+.choice {
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.choice[aria-pressed="true"] .copy strong {
+  font-weight: 750;
+}
+.choice .mark {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .choice { transition: none; }
+}
